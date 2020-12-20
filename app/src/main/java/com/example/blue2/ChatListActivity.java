@@ -80,6 +80,7 @@ public class ChatListActivity extends AppCompatActivity {
             case R.id.btn_turnon_bluetooth:
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
+                break;
             case R.id.btn_start_new_chat:
                 startNewChat();
                 break;

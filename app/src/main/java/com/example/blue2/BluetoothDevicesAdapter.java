@@ -11,29 +11,29 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class PairedDevicesAdapter extends RecyclerView.Adapter<PairedDevicesAdapter.ViewHolder> {
+public class BluetoothDevicesAdapter extends RecyclerView.Adapter<BluetoothDevicesAdapter.ViewHolder> {
 
-    private List<BluetoothDevice> mPairedDevices;
+    private List<BluetoothDevice> mBlutoothDevices;
 
-    public PairedDevicesAdapter(List<BluetoothDevice> pairedDevices) {
-        this.mPairedDevices = pairedDevices;
+    public BluetoothDevicesAdapter(List<BluetoothDevice> bluetoothDevices) {
+        this.mBlutoothDevices = bluetoothDevices;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_paired_device, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bluetooth_device, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bindItem(mPairedDevices.get(position));
+        holder.bindItem(mBlutoothDevices.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mPairedDevices.size();
+        return mBlutoothDevices.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
