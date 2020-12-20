@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +45,12 @@ public class DeviceListActivity extends AppCompatActivity {
     }
 
     private void startScan() {
-        ScanForDeviceFragment scanFragment = new ScanForDeviceFragment();
-//        scanFragment.setTargetFragment(this, 1);
+        ScanForDeviceFragment scanFragment = new ScanForDeviceFragment(this::onDeviceSelected);
         scanFragment.show(getSupportFragmentManager(), "Scan for device");
+    }
+
+    private void onDeviceSelected(BluetoothDevice bluetoothDevice) {
+        Toast.makeText(this, bluetoothDevice.getName(), Toast.LENGTH_SHORT).show();
     }
 
 }

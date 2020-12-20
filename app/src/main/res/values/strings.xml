@@ -13,4 +13,6 @@
     <string name="msg_scan_for_device">Can\'t find a device?</string>
     <string name="scan">Scan</string>
     <string name="scanning">Scanning…</string>
+    <string name="no_devices_found">No devices found</string>
+    <string name="try_again">Try again</string>
 </resources>

@@ -8,12 +8,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +33,19 @@ public class ScanForDeviceFragment extends DialogFragment {
 
     private static final int REQUEST_ACCESS_FINE_LOCATION = 2001;
 
+    interface OnDeviceSelectedListener {
+        void onDeviceSelected(BluetoothDevice bluetoothDevice);
+    }
     private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevicesAdapter mAdapter;
     private final List<BluetoothDevice> mDiscoveredDevicesList = new ArrayList<>();
-    private View scanInprogressView;
+    private View mScanInprogressView;
+    private OnDeviceSelectedListener mListener;
+    private View mNoDevicesFoundView;
+
+    public ScanForDeviceFragment(OnDeviceSelectedListener listener) {
+        this.mListener = listener;
+    }
 
     @Nullable
     @Override
@@ -50,7 +63,10 @@ public class ScanForDeviceFragment extends DialogFragment {
         devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new BluetoothDevicesAdapter(mDiscoveredDevicesList);
         devicesRecyclerView.setAdapter(mAdapter);
-        scanInprogressView = fragView.findViewById(R.id.ll_scan_inprogress);
+        devicesRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this::onItemClick));
+        mScanInprogressView = fragView.findViewById(R.id.ll_scan_inprogress);
+        mNoDevicesFoundView = fragView.findViewById(R.id.rl_no_devices_found);
+        fragView.findViewById(R.id.btn_try_again).setOnClickListener(v -> startDiscovery());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             switch (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -66,6 +82,22 @@ public class ScanForDeviceFragment extends DialogFragment {
         }
 
         return fragView;
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        Window window = getDialog().getWindow();
+        Point size = new Point();
+
+        Display display = window.getWindowManager().getDefaultDisplay();
+        display.getSize(size);
+
+        int width = size.x;
+        int height = size.y;
+
+        window.setLayout((int) (width * 0.80), (int) (height * 0.6));
+        window.setGravity(Gravity.CENTER);
     }
 
     @Override
@@ -94,6 +126,11 @@ public class ScanForDeviceFragment extends DialogFragment {
         mBluetoothAdapter.startDiscovery();
     }
 
+    private void onItemClick(View view, int position) {
+        mListener.onDeviceSelected(mDiscoveredDevicesList.get(position));
+        dismiss();
+    }
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -113,9 +150,13 @@ public class ScanForDeviceFragment extends DialogFragment {
                     }
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                scanInprogressView.setVisibility(View.GONE);
+                mScanInprogressView.setVisibility(View.GONE);
+                if (mDiscoveredDevicesList.size() == 0) {
+                    mNoDevicesFoundView.setVisibility(View.VISIBLE);
+                }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                scanInprogressView.setVisibility(View.VISIBLE);
+                mScanInprogressView.setVisibility(View.VISIBLE);
+                mNoDevicesFoundView.setVisibility(View.GONE);
             }
         }
     };
