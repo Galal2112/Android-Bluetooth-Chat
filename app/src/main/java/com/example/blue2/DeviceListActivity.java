@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class DeviceListActivity extends AppCompatActivity {
+public class DeviceListActivity extends AppCompatActivity implements ConnectThread.OnConnectListener {
 
     private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevicesAdapter mAdapter;
@@ -37,7 +37,24 @@ public class DeviceListActivity extends AppCompatActivity {
         findViewById(R.id.btn_scan_bluetooth).setOnClickListener(this::onClick);
     }
 
-    public void onClick(View v) {
+
+    @Override
+    public void onConnectionSuccess() {
+        runOnUiThread(() -> {
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            mPairedDevicesList.clear();
+            mPairedDevicesList.addAll(pairedDevices);
+            mAdapter.notifyDataSetChanged();
+            Toast.makeText(DeviceListActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    public void onConnectionFailure() {
+        Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_scan_bluetooth:
                 startScan();
@@ -54,8 +71,7 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private void onDeviceSelected(BluetoothDevice bluetoothDevice) {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        mConnectThread = new ConnectThread(bluetoothDevice);
+        mConnectThread = new ConnectThread(bluetoothDevice, this);
         mConnectThread.start();
     }
-
 }
