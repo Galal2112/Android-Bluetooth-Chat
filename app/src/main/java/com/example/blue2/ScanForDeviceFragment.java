@@ -128,6 +128,7 @@ public class ScanForDeviceFragment extends DialogFragment {
 
     private void onItemClick(View view, int position) {
         mListener.onDeviceSelected(mDiscoveredDevicesList.get(position));
+        mBluetoothAdapter.cancelDiscovery();
         dismiss();
     }
 
