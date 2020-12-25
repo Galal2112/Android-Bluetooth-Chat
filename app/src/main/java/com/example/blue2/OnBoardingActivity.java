@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.blue2.network.BluetoothService;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class OnBoardingActivity extends AppCompatActivity {

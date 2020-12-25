@@ -26,7 +26,7 @@
             android:name=".DeviceListActivity"
             android:label="@string/select_Devices" />
         <service
-            android:name=".BluetoothService"
+            android:name=".network.BluetoothService"
             android:enabled="true"
             android:exported="true"/>
     </application>

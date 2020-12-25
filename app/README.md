@@ -2,3 +2,5 @@
 * https://developer.android.com/guide/topics/ui/layout/recyclerview
 * https://sapandiwakar.in/recycler-view-item-click-handler/
 * https://code.tutsplus.com/tutorials/create-a-bluetooth-scanner-with-androids-bluetooth-api--cms-24084
+* https://developer.android.com/training/data-storage/room
+* https://developer.android.com/training/data-storage/room/accessing-data

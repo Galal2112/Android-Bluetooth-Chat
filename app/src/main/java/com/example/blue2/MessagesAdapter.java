@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.blue2.database.Message;
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -47,7 +49,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     @Override
     public int getItemViewType(int position) {
         Message message = mMessages.get(position);
-        if (message.isMine()){
+        if (message.senderAddress == null){
             return VIEW_TYPE_SENT;
         }
         return VIEW_TYPE_RECIEVED;
@@ -62,7 +64,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         }
 
         void bind (Message message){
-            mMessageTextView.setText(message.getText());
+            mMessageTextView.setText(message.textBody);
         }
     }
 

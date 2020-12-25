@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.example.blue2.database.Message;
+import com.example.blue2.network.BluetoothService;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +70,8 @@ public class ChatActivity extends AppCompatActivity {
         intent.setAction(BluetoothService.ACTION_SEND_MESSAGE);
         intent.putExtra(BluetoothService.EXTRA_MESSAGE, text);
         startService(intent);
-        Message message = new Message(text, true);
+        Message message = new Message();
+        message.textBody = text;
         addMessage(message);
         mChatMsgEditText.setText("");
         mRevicesRecyclerView.smoothScrollToPosition(mMessages.size());
@@ -78,7 +82,9 @@ public class ChatActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BluetoothService.ACTION_MESSAGE_RECEIVED)) {
                 String text = intent.getStringExtra(BluetoothService.EXTRA_MESSAGE);
-                Message message = new Message(text, false);
+                Message message = new Message();
+                message.textBody = text;
+                message.senderAddress = "SET ME";
                 addMessage(message);
             }
         }

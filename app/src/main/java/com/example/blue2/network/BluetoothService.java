@@ -1,4 +1,4 @@
-package com.example.blue2;
+package com.example.blue2.network;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
