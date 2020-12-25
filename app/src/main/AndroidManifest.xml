@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Blue2">
-        <activity android:name=".ChatListActivity"
+        <activity android:name=".ChatActivity" />
+
+        <activity
+            android:name=".ChatListActivity"
             android:label="@string/title_chat_list" />
         <activity android:name=".OnBoardingActivity">
             <intent-filter>
@@ -22,9 +25,14 @@
         <activity
             android:name=".DeviceListActivity"
             android:label="@string/select_Devices" />
+        <service
+            android:name=".BluetoothService"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
-
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
 </manifest>

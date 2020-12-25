@@ -15,12 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class DeviceListActivity extends AppCompatActivity implements ConnectThread.OnConnectListener {
+public class DeviceListActivity extends AppCompatActivity {
 
-    private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevicesAdapter mAdapter;
+    private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private final List<BluetoothDevice> mPairedDevicesList = new ArrayList<>();
-    private ConnectThread mConnectThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +34,20 @@ public class DeviceListActivity extends AppCompatActivity implements ConnectThre
         mAdapter = new BluetoothDevicesAdapter(mPairedDevicesList);
         devicesRecyclerView.setAdapter(mAdapter);
         findViewById(R.id.btn_scan_bluetooth).setOnClickListener(this::onClick);
-    }
-
-
-    @Override
-    public void onConnectionSuccess() {
-        runOnUiThread(() -> {
-            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            mPairedDevicesList.clear();
-            mPairedDevicesList.addAll(pairedDevices);
-            mAdapter.notifyDataSetChanged();
-            Toast.makeText(DeviceListActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-        });
+        devicesRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, this::onItemClick));
     }
 
     @Override
-    public void onConnectionFailure() {
-        Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show();
+    protected void onResume() {
+        super.onResume();
+        refreshList();
+    }
+
+    private void refreshList() {
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        mPairedDevicesList.clear();
+        mPairedDevicesList.addAll(pairedDevices);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void onClick(View v) {
@@ -69,9 +65,11 @@ public class DeviceListActivity extends AppCompatActivity implements ConnectThre
         scanFragment.show(getSupportFragmentManager(), "Scan for device");
     }
 
+    private void onItemClick(View view, int position) {
+        onDeviceSelected(mPairedDevicesList.get(position));
+    }
     private void onDeviceSelected(BluetoothDevice bluetoothDevice) {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        mConnectThread = new ConnectThread(bluetoothDevice, this);
-        mConnectThread.start();
+        ChatActivity.startActivity(this,bluetoothDevice);
     }
 }

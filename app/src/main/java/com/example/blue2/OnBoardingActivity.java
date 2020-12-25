@@ -7,7 +7,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class OnBoardingActivity extends AppCompatActivity{
+public class OnBoardingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +27,10 @@ public class OnBoardingActivity extends AppCompatActivity{
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_start_chat:
+                Intent intent = new Intent(this, BluetoothService.class);
+                intent.setAction(BluetoothService.ACTION_START);
+                startService(intent);
+
                 startChat();
             default:
                 break;

@@ -48,7 +48,11 @@ public class BluetoothDevicesAdapter extends RecyclerView.Adapter<BluetoothDevic
 
         void bindItem(BluetoothDevice device) {
             nameTextView.setText(device.getName());
-            shortcutTextView.setText(String.valueOf(device.getName().charAt(0)));
+            if (device.getName() != null) {
+                shortcutTextView.setText(String.valueOf(device.getName().charAt(0)));
+            } else {
+                shortcutTextView.setText("N");
+            }
         }
     }
 }

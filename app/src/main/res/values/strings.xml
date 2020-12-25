@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Bluetooth Chatting App</string>
+    <string name="app_name">BlueChatApp</string>
     <string name="select_Devices">Select device</string>
     <string name="title_chat_list">Chats</string>
     <string name="start_chat">Start Chat</string>
-    <string name="welcome_msg">Welcome to Blutooth Chat</string>
+    <string name="welcome_msg">Welcome to BlueChatApp</string>
     <string name="no_bluetooth_error">Sorry your device does not support Bluetooth</string>
     <string name="enable_bluetooth">Bluetooth is turned off</string>
     <string name="turn_on">Turn on</string>
