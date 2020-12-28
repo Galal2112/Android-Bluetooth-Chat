@@ -1,17 +1,25 @@
 package com.example.blue2;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.blue2.database.AppDatabase;
+import com.example.blue2.database.Conversation;
+import com.example.blue2.database.ConversationResult;
+import com.example.blue2.database.Message;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,8 +34,51 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        AppDatabase database = AppDatabase.getDatabase(this);
+
+        Conversation conversation1 = new Conversation();
+        conversation1.opponentAddress = "ABC";
+        conversation1.opponentName = "Ahmed";
+        long conversation1Id = database.conversationDao().insert(conversation1);
+
+        Conversation conversation2 = new Conversation();
+        conversation2.opponentAddress = "XYZ";
+        conversation2.opponentName = "Galal";
+        long conversation2Id = database.conversationDao().insert(conversation2);
+
+        Message c1m1 = new Message();
+        c1m1.senderAddress = "ABC";
+        c1m1.textBody = "Body 1";
+        c1m1.parentConversationId = conversation1Id;
+        Message c1m2 = new Message();
+        c1m2.senderAddress = null;
+        c1m2.textBody = "Body 2";
+        c1m2.parentConversationId = conversation1Id;
+        database.conversationDao().insert(c1m1);
+        database.conversationDao().insert(c1m2);
 
 
+        Message c2m1 = new Message();
+        c2m1.senderAddress = null;
+        c2m1.textBody = "Bodyghgsghgsghs 1";
+        c2m1.parentConversationId = conversation2Id;
+        Message c2m2 = new Message();
+        c2m2.senderAddress = "XYZ";
+        c2m2.textBody = "Bodyghgsghgsghs 2";
+        c2m2.parentConversationId = conversation2Id;
+        Message c2m3 = new Message();
+        c2m3.senderAddress = "XYZ";
+        c2m3.textBody = "Bodyghgsghgsghs 3";
+        c2m3.parentConversationId = conversation2Id;
+        database.conversationDao().insert(c2m1);
+        database.conversationDao().insert(c2m2);
+        database.conversationDao().insert(c2m3);
+
+        List<ConversationResult> messages = database.conversationDao().getAll().getValue();
+        for(int i = 0; i < messages.size(); i++) {
+            ConversationResult result = messages.get(i);
+            Log.d("Galal Ahmed", result.conversationId + " " + result.opponentName + " " + result.opponentAddress + " " + result.textBody);
+        }
         if (bluetoothAdapter == null) {
 
             Toast.makeText(this, "Sie haben kein Bluetooth !!", Toast.LENGTH_SHORT).show();
