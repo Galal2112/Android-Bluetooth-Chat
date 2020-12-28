@@ -63,11 +63,7 @@
             android:paddingEnd="20dp"
             android:text="@string/start_chat"
             android:textAllCaps="false"
-<<<<<<< Updated upstream
-            app:backgroundTint="#000000" />
-=======
             app:backgroundTint="#3498DB" />
->>>>>>> Stashed changes
 
     </LinearLayout>
 

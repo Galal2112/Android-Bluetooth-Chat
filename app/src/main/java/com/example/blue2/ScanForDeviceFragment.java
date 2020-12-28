@@ -17,13 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-<<<<<<< Updated upstream
-import android.view.WindowManager;
-
-import java.util.ArrayList;
-import java.util.List;
-=======
->>>>>>> Stashed changes
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,15 +25,12 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-<<<<<<< Updated upstream
-=======
 import com.example.blue2.mvvm.view.BluetoothDevicesAdapter;
 import com.example.blue2.mvvm.view.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
->>>>>>> Stashed changes
 public class ScanForDeviceFragment extends DialogFragment {
 
     private static final int REQUEST_ACCESS_FINE_LOCATION = 2001;
@@ -59,19 +49,6 @@ public class ScanForDeviceFragment extends DialogFragment {
         this.mListener = listener;
     }
 
-<<<<<<< Updated upstream
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragView = inflater.inflate(R.layout.fragment_scan_for_device, container, false);
-
-        IntentFilter foundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        requireActivity().registerReceiver(mReceiver, foundFilter);
-        IntentFilter filterDicoveryFinished = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        requireActivity().registerReceiver(mReceiver, filterDicoveryFinished);
-        IntentFilter filterDicoveryStarted = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        requireActivity().registerReceiver(mReceiver, filterDicoveryStarted);
-=======
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,22 +65,16 @@ public class ScanForDeviceFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View fragView = inflater.inflate(R.layout.fragment_scan_for_device, container, false);
->>>>>>> Stashed changes
 
         RecyclerView devicesRecyclerView = fragView.findViewById(R.id.rv_scanned);
         devicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new BluetoothDevicesAdapter(mDiscoveredDevicesList);
         devicesRecyclerView.setAdapter(mAdapter);
         devicesRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), this::onItemClick));
-<<<<<<< Updated upstream
-        mScanInprogressView = fragView.findViewById(R.id.ll_scan_inprogress);
-        mNoDevicesFoundView = fragView.findViewById(R.id.rl_no_devices_found);
-=======
 
         mScanInprogressView = fragView.findViewById(R.id.ll_scan_inprogress);
         mNoDevicesFoundView = fragView.findViewById(R.id.rl_no_devices_found);
 
->>>>>>> Stashed changes
         fragView.findViewById(R.id.btn_try_again).setOnClickListener(v -> startDiscovery());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -195,11 +166,7 @@ public class ScanForDeviceFragment extends DialogFragment {
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 mScanInprogressView.setVisibility(View.VISIBLE);
-<<<<<<< Updated upstream
-                mNoDevicesFoundView.setVisibility(View.GONE);
-=======
                 mNoDevicesFoundView.setVisibility(View.VISIBLE);
->>>>>>> Stashed changes
             }
         }
     };

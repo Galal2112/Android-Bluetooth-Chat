@@ -10,13 +10,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-<<<<<<< Updated upstream
-=======
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
->>>>>>> Stashed changes
 import com.example.blue2.database.AppDatabase;
 import com.example.blue2.database.Conversation;
 import com.example.blue2.database.ConversationResult;
@@ -77,11 +74,7 @@ public class MainActivity extends AppCompatActivity {
         database.conversationDao().insert(c2m2);
         database.conversationDao().insert(c2m3);
 
-<<<<<<< Updated upstream
-        List<ConversationResult> messages = database.conversationDao().getAll();
-=======
         List<ConversationResult> messages = database.conversationDao().getAll().getValue();
->>>>>>> Stashed changes
         for(int i = 0; i < messages.size(); i++) {
             ConversationResult result = messages.get(i);
             Log.d("Galal Ahmed", result.conversationId + " " + result.opponentName + " " + result.opponentAddress + " " + result.textBody);

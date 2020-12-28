@@ -5,20 +5,10 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-<<<<<<< Updated upstream
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-=======
->>>>>>> Stashed changes
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-<<<<<<< Updated upstream
-=======
 
 import com.example.blue2.mvvm.view.BluetoothDevicesAdapter;
 import com.example.blue2.mvvm.view.ChatActivity;
@@ -27,7 +17,6 @@ import com.example.blue2.mvvm.view.RecyclerItemClickListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
->>>>>>> Stashed changes
 
 public class DeviceListActivity extends AppCompatActivity {
 
@@ -84,10 +73,6 @@ public class DeviceListActivity extends AppCompatActivity {
     }
     private void onDeviceSelected(BluetoothDevice bluetoothDevice) {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-<<<<<<< Updated upstream
-        ChatActivity.startActivity(this,bluetoothDevice);
-=======
         ChatActivity.startActivity(this, bluetoothDevice);
->>>>>>> Stashed changes
     }
 }
