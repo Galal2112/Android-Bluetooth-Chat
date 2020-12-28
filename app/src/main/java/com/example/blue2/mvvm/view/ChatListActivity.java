@@ -53,7 +53,7 @@ public class ChatListActivity extends AppCompatActivity {
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         enableChat(bluetoothAdapter.isEnabled());
-        if(bluetoothAdapter.enable()){
+        if(bluetoothAdapter.isEnabled()){
             startBluetoothService();
         }
 
@@ -101,8 +101,12 @@ public class ChatListActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_start_chat:
-                startNewChat();
-                break;
+                if(BluetoothAdapter.getDefaultAdapter().isEnabled()){
+                    startNewChat();
+                    break;
+                }else {
+                    Toast.makeText(this, R.string.enable_bluetooth_error,Toast.LENGTH_LONG).show();
+                }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -114,8 +118,14 @@ public class ChatListActivity extends AppCompatActivity {
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
                 break;
             case R.id.btn_start_new_chat:
-                startNewChat();
-                break;
+
+                if (BluetoothAdapter.getDefaultAdapter().isEnabled()){
+                    startNewChat();
+                    break;
+                } else {
+                    Toast.makeText(this, R.string.enable_bluetooth_error,Toast.LENGTH_LONG).show();
+                }
+
             default:
                 break;
         }
