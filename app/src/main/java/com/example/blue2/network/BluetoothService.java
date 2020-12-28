@@ -23,6 +23,10 @@ public class BluetoothService extends Service {
 
     public static final String ACTION_SEND_MESSAGE = "com.example.blue2.action.SEND_MESSAGE";
     public static final String ACTION_START = "com.example.blue2.action.START";
+<<<<<<< Updated upstream
+=======
+    public static final String ACTION_CANCEL = "com.example.blue2.action.CANCEL";
+>>>>>>> Stashed changes
 
     public static final String ACTION_MESSAGE_SENT = "com.example.blue2.action.MESSAGE_SENT";
     public static final String ACTION_MESSAGE_RECEIVED = "com.example.blue2.action.MESSAGE_RECEIVED";
@@ -47,8 +51,14 @@ public class BluetoothService extends Service {
 
     private StartConnectionThread mStartConnectionThread;
     private ConnectedThread mConnectedThread;
+<<<<<<< Updated upstream
     private BluetoothAdapter mBluetoothAdapter;
     private AcceptConnectionThread mAcceptConnectionThread;
+=======
+    private AcceptConnectionThread mAcceptConnectionThread;
+
+    private BluetoothAdapter mBluetoothAdapter;
+>>>>>>> Stashed changes
     private String mCurrentDeviceAddress = "";
 
     private static int mState = STATE_NONE;
@@ -83,6 +93,11 @@ public class BluetoothService extends Service {
             Log.d("Galal Ahmed", "Send message from service: " + this);
             String message = intent.getStringExtra(EXTRA_MESSAGE);
             sendData(message.getBytes());
+<<<<<<< Updated upstream
+=======
+        } else if (intent.getAction().equals(ACTION_CANCEL)) {
+           cancel();
+>>>>>>> Stashed changes
         }
         return START_STICKY;
     }
@@ -193,6 +208,16 @@ public class BluetoothService extends Service {
             }
             r.write(data);
         } else {
+<<<<<<< Updated upstream
+=======
+            if (mCurrentDeviceAddress != null) {
+                BluetoothDevice bluetoothDevice = mBluetoothAdapter.getRemoteDevice(mCurrentDeviceAddress);
+                if (bluetoothDevice != null) {
+                    connectToDevice(bluetoothDevice);
+                }
+            }
+
+>>>>>>> Stashed changes
             Log.d("Galal Ahmed", "send Data Error");
         }
 

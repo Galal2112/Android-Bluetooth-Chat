@@ -6,7 +6,11 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+<<<<<<< Updated upstream
 @Database(entities = {Conversation.class, Message.class }, version = 1)
+=======
+@Database(entities = {Conversation.class, Message.class},exportSchema = false, version = 1)
+>>>>>>> Stashed changes
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
