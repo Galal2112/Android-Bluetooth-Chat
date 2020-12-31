@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 
 
 @RunWith(AndroidJUnit4.class)
-public class Testen {
+public class DatabaseUndViewModelIntegrationTests {
 
 
     private AppDatabase appDatabase;
@@ -154,69 +154,4 @@ public class Testen {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-  /*
-
-   Conversation conversation = new Conversation();
-        conversation.conversationId = 10L;
-        conversation.opponentAddress = "123";
-        conversation.opponentName = "Amro";
-
-
-    Object[] messages =messageList.toArray();
-
-
-        Object[] messages2 =  chatViewModel.getmDao().getConversationMessages(x).getValue().toArray();
-
-
-        for (Object e : messages) {
-
-            Message u = (Message) e;
-
-            for (Object c : messages2) {
-
-                Message q = (Message) c;
-
-                if (u.textBody.equals(q.textBody)) {
-
-                    y = true;
-
-
-                }
-
-            }
-
-        }
-
-*/
-
-/*
-
-    Conversation conversation = new Conversation();
-    conversation.conversationId = 10L;
-    conversation.opponentAddress = "123";
-    conversation.opponentName = "Amro";
-
-        chatViewModel.setmDevice(mTestDevice);
-
-        chatViewModel.setmConversation(conversation);
-
-    assertTrue(conversationDao.getConversation("123")==null);
-
-        conversationDao.insert(conversation);
-
-        conversationDao.getConversation("123");
-
-
-    assertTrue(conversationDao.getConversation("123")!=null);
-*/
 }

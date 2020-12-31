@@ -50,6 +50,7 @@ public class BluetoothService extends Service implements NetworkInterface {
     private AcceptConnectionThread mAcceptConnectionThread;
     private BluetoothAdapter mBluetoothAdapter;
     private String mCurrentDeviceAddress = "";
+    private boolean brodcast = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -163,7 +164,7 @@ public class BluetoothService extends Service implements NetworkInterface {
         mCurrentDeviceAddress = device.getAddress();
     }
 
-    private synchronized void cancel() {
+    public synchronized void cancel() {
         mState = STATE_NONE;
 
         if (mStartConnectionThread != null) {
@@ -204,16 +205,24 @@ public class BluetoothService extends Service implements NetworkInterface {
 
     }
 
-    private void onConnectionFailed() {
+    public void onConnectionFailed() {
         sendBroadcast(ACTION_CONNECTION_FAILURE, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
-    private void onConnectionLost() {
+    public void onConnectionLost() {
         sendBroadcast(ACTION_CONNECTION_LOST, null);
         mState = STATE_NONE;
         startListenerThread();
+    }
+
+    public boolean isBrodcast() {
+        return brodcast;
+    }
+
+    public void setBrodcast(boolean brodcast) {
+        this.brodcast = brodcast;
     }
 
     public void sendBroadcast(String action, Map<String, String> extras) {
@@ -223,7 +232,9 @@ public class BluetoothService extends Service implements NetworkInterface {
                 intent.putExtra(key, extras.get(key));
             }
         }
+
         sendBroadcast(intent);
+        brodcast = true;
     }
 
     public void setmStartConnectionThread(StartConnectionThread mStartConnectionThread) {

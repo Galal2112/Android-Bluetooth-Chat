@@ -19,6 +19,12 @@ public interface NetworkInterface {
 
     void sendBroadcast(String action, Map<String, String> extras);
 
+    void cancel();
+
+    void onConnectionFailed();
+
+    void onConnectionLost();
+
     BluetoothService.StartConnectionThread getmStartConnectionThread();
 
     BluetoothService.ConnectedThread getmConnectedThread();
@@ -38,5 +44,9 @@ public interface NetworkInterface {
     BluetoothAdapter getmBluetoothAdapter();
 
     void setmBluetoothAdapter(BluetoothAdapter mBluetoothAdapter);
+
+    boolean isBrodcast();
+
+    void setBrodcast(boolean brodcast);
 
 }

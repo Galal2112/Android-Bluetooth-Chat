@@ -27,8 +27,6 @@ import static org.junit.Assert.*;
 public class BluetoothServiceTest {
 
 
-    // Context context = mock(ChatListActivity.class);
-
     NetworkInterface blueToothService;
 
 
@@ -37,7 +35,6 @@ public class BluetoothServiceTest {
 
 
         blueToothService = new BluetoothService();
-
 
     }
 
@@ -79,7 +76,6 @@ public class BluetoothServiceTest {
 
     }
 
-
     @Test
     public void onDeviceConnectedTest() {
         BluetoothService.AcceptConnectionThread thread = mock(BluetoothService.AcceptConnectionThread.class);
@@ -101,7 +97,6 @@ public class BluetoothServiceTest {
 
     }
 
-
     @Test
     public void sendDataTest() {
 
@@ -115,9 +110,8 @@ public class BluetoothServiceTest {
         BluetoothAdapter bluetoothAdapter = mock(BluetoothAdapter.class);
 
 
-
         blueToothService.setmCurrentDeviceAddress("123456");
-        BluetoothDevice bluetoothDevice1 =  bluetoothAdapter.getRemoteDevice( blueToothService.getmCurrentDeviceAddress());
+        BluetoothDevice bluetoothDevice1 = bluetoothAdapter.getRemoteDevice(blueToothService.getmCurrentDeviceAddress());
         blueToothService.setmBluetoothAdapter(bluetoothAdapter);
         byte[] bytes = {1, 2, 3};
 
@@ -127,7 +121,7 @@ public class BluetoothServiceTest {
 
 
     }
-/*
+
     @Test
     public void sendBroadcast() {
 
@@ -136,13 +130,58 @@ public class BluetoothServiceTest {
         String action = "action";
 
 
+        assertTrue(blueToothService.isBrodcast() == false);
+
+
         blueToothService.sendBroadcast(action, extras);
 
 
-        assertTrue();
+        assertTrue(blueToothService.isBrodcast() == true);
 
 
     }
-*/
+
+    @Test
+    public void onConnectionFailedTest() {
+
+        BluetoothService.AcceptConnectionThread thread = mock(BluetoothService.AcceptConnectionThread.class);
+        blueToothService.setmAcceptConnectionThread(thread);
+
+        BluetoothService.ConnectedThread thread1 = mock(BluetoothService.ConnectedThread.class);
+        blueToothService.setmConnectedThread(thread1);
+
+        BluetoothService.StartConnectionThread thread2 = mock(BluetoothService.StartConnectionThread.class);
+        blueToothService.setmStartConnectionThread(thread2);
+
+        blueToothService.onConnectionFailed();
+
+
+        assertTrue(blueToothService.getmStartConnectionThread() == null);
+        assertTrue(blueToothService.getmConnectedThread() == null);
+        assertTrue(blueToothService.getmAcceptConnectionThread() != null);
+
+    }
+
+    @Test
+    public void onConnectionLostTest() {
+
+        BluetoothService.AcceptConnectionThread thread = mock(BluetoothService.AcceptConnectionThread.class);
+        blueToothService.setmAcceptConnectionThread(thread);
+
+        BluetoothService.ConnectedThread thread1 = mock(BluetoothService.ConnectedThread.class);
+        blueToothService.setmConnectedThread(thread1);
+
+        BluetoothService.StartConnectionThread thread2 = mock(BluetoothService.StartConnectionThread.class);
+        blueToothService.setmStartConnectionThread(thread2);
+
+        blueToothService.onConnectionLost();
+
+
+        assertTrue(blueToothService.getmStartConnectionThread() == null);
+        assertTrue(blueToothService.getmConnectedThread() == null);
+        assertTrue(blueToothService.getmAcceptConnectionThread() != null);
+
+    }
+
 
 }
