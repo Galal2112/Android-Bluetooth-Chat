@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="20dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@+id/tv_shortcut"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/rounded_corner_20dp"
+        android:gravity="center"
+        android:text="G"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="0dp"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content" android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="sg"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            tools:ignore="RtlCompat" />
+        <TextView
+            android:id="@+id/tv_last_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="sg"
+            android:textSize="12dp"
+            tools:ignore="RtlCompat" />
+    </LinearLayout>
+</LinearLayout>
