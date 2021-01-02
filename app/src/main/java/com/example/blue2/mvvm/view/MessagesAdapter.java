@@ -13,7 +13,7 @@ import com.example.blue2.database.Message;
 
 import java.util.List;
 
-public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder>{
+public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder> implements AdaptersInterface{
 
     private static final int VIEW_TYPE_SENT = 1;
     private static final int VIEW_TYPE_RECIEVED = 2;

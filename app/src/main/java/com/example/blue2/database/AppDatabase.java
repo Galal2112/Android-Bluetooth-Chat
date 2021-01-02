@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Conversation.class, Message.class},exportSchema = false, version = 1)
+@Database(entities = {Conversation.class, Message.class}, exportSchema = false, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -23,6 +23,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
+
 
     public abstract ConversationDao conversationDao();
 

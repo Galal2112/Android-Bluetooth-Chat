@@ -13,7 +13,7 @@ import com.example.blue2.R;
 
 import java.util.List;
 
-public class BluetoothDevicesAdapter extends RecyclerView.Adapter<BluetoothDevicesAdapter.ViewHolder> {
+public class BluetoothDevicesAdapter extends RecyclerView.Adapter<BluetoothDevicesAdapter.ViewHolder> implements AdaptersInterface {
 
     private List<BluetoothDevice> mBlutoothDevices;
 

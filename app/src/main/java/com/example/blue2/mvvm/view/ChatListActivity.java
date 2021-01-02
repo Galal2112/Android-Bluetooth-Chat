@@ -28,6 +28,7 @@ import com.example.blue2.R;
 import com.example.blue2.database.ConversationResult;
 import com.example.blue2.mvvm.viewmodel.ChatListViewModel;
 import com.example.blue2.network.BluetoothService;
+import com.example.blue2.network.NetworkInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ChatListActivity extends AppCompatActivity {
     private Button mStartChatButton;
     private static final int REQUEST_ENABLE_BLUETOOTH = 1001;
     private ChatListViewModel mViewModel;
-    private ConversationAdapter mAdapter;
+    private  ConversationAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +171,7 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void startBluetoothService (){
+
         Intent intent = new Intent(this, BluetoothService.class);
         intent.setAction(BluetoothService.ACTION_START);
         startService(intent);

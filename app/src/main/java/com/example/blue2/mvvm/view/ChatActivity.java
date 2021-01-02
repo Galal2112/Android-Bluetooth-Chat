@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.EditText;
 
@@ -26,13 +28,15 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mChatMsgEditText;
     private MessagesAdapter mAdapter;
     private RecyclerView mMessagesRecyclerView;
-    private ChatViewModel mViewModel;
+    private ChatViewModel mViewModel ;
 
     public static void startActivity(Context context, BluetoothDevice bluetoothDevice) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(EXTRA_BLUETOOTH_DEVICE, bluetoothDevice);
         context.startActivity(intent);
+
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +44,10 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         BluetoothDevice bluetoothDevice = getIntent().getParcelableExtra(EXTRA_BLUETOOTH_DEVICE);
+
         mViewModel = new ViewModelProvider(this).get(ChatViewModel.class);
         mViewModel.start(bluetoothDevice);
+
 
         mChatMsgEditText = findViewById(R.id.edit_message);
         findViewById(R.id.btn_send).setOnClickListener(this::send);
@@ -75,4 +81,12 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    public ChatViewModel getmViewModel() {
+
+        return mViewModel;
+    }
+
+
 }

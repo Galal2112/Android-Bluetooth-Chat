@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class BluetoothService extends Service {
+public class BluetoothService extends Service implements NetworkInterface {
 
     public static final String ACTION_SEND_MESSAGE = "com.example.blue2.action.SEND_MESSAGE";
     public static final String ACTION_START = "com.example.blue2.action.START";
@@ -37,25 +37,20 @@ public class BluetoothService extends Service {
     public static final String EXTRA_MESSAGE = "com.example.blue2.extra.EXTRA_MESSAGE";
     public static final String EXTRA_DEVICE_NAME = "com.example.blue2.extra.DEVICE_NAME";
     public static final String EXTRA_DEVICE_ADDRESS = "com.example.blue2.extra.DEVICE_ADDRESS";
-
-
-    private static final UUID MY_UUID_SECURE = UUID.fromString("b9d04dfb-3da4-4622-b253-63f8ace49d9a");
     public static final int STATE_NONE = 0;
     public static final int STATE_LISTEN = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
+    private static final UUID MY_UUID_SECURE = UUID.fromString("b9d04dfb-3da4-4622-b253-63f8ace49d9a");
     private static final String BLUE_CHAT_APP = "BluetoothService";
-
+    private static int mState = STATE_NONE;
+    private final Handler mUIHanlder = new Handler(Looper.getMainLooper());
     private StartConnectionThread mStartConnectionThread;
     private ConnectedThread mConnectedThread;
     private AcceptConnectionThread mAcceptConnectionThread;
-
     private BluetoothAdapter mBluetoothAdapter;
     private String mCurrentDeviceAddress = "";
-
-    private static int mState = STATE_NONE;
-
-    private final Handler mUIHanlder = new Handler(Looper.getMainLooper());
+    private boolean brodcast = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -86,7 +81,7 @@ public class BluetoothService extends Service {
             String message = intent.getStringExtra(EXTRA_MESSAGE);
             sendData(message.getBytes());
         } else if (intent.getAction().equals(ACTION_CANCEL)) {
-           cancel();
+            cancel();
         }
         return START_STICKY;
     }
@@ -105,7 +100,8 @@ public class BluetoothService extends Service {
         super.onDestroy();
     }
 
-    private synchronized void startListenerThread() {
+    @Override
+    public synchronized void startListenerThread() {
 
         if (mStartConnectionThread != null) {
             mStartConnectionThread.cancel();
@@ -123,7 +119,7 @@ public class BluetoothService extends Service {
         }
     }
 
-    private synchronized void connectToDevice(BluetoothDevice bluetoothDevice) {
+    public synchronized void connectToDevice(BluetoothDevice bluetoothDevice) {
 
         if (mState == STATE_CONNECTING) {
             if (mStartConnectionThread != null) {
@@ -141,7 +137,7 @@ public class BluetoothService extends Service {
         mStartConnectionThread.start();
     }
 
-    private synchronized void onDeviceConnected(BluetoothSocket socket, BluetoothDevice device) {
+    public synchronized void onDeviceConnected(BluetoothSocket socket, BluetoothDevice device) {
 
         if (mStartConnectionThread != null) {
             mStartConnectionThread.cancel();
@@ -168,7 +164,7 @@ public class BluetoothService extends Service {
         mCurrentDeviceAddress = device.getAddress();
     }
 
-    private synchronized void cancel() {
+    public synchronized void cancel() {
         mState = STATE_NONE;
 
         if (mStartConnectionThread != null) {
@@ -188,7 +184,7 @@ public class BluetoothService extends Service {
         stopSelf();
     }
 
-    private void sendData(byte[] data) {
+    public void sendData(byte[] data) {
         if (mConnectedThread != null) {
             ConnectedThread r;
             synchronized (this) {
@@ -209,29 +205,79 @@ public class BluetoothService extends Service {
 
     }
 
-    private void onConnectionFailed() {
+    public void onConnectionFailed() {
         sendBroadcast(ACTION_CONNECTION_FAILURE, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
-    private void onConnectionLost() {
+    public void onConnectionLost() {
         sendBroadcast(ACTION_CONNECTION_LOST, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
-    private void sendBroadcast(String action, Map<String, String> extras) {
+    public boolean isBrodcast() {
+        return brodcast;
+    }
+
+    public void setBrodcast(boolean brodcast) {
+        this.brodcast = brodcast;
+    }
+
+    public void sendBroadcast(String action, Map<String, String> extras) {
         Intent intent = new Intent(action);
         if (extras != null && !extras.isEmpty()) {
             for (String key : extras.keySet()) {
                 intent.putExtra(key, extras.get(key));
             }
         }
+
         sendBroadcast(intent);
+        brodcast = true;
     }
 
-    private class StartConnectionThread extends Thread {
+    public void setmStartConnectionThread(StartConnectionThread mStartConnectionThread) {
+        this.mStartConnectionThread = mStartConnectionThread;
+    }
+
+    public void setmConnectedThread(ConnectedThread mConnectedThread) {
+        this.mConnectedThread = mConnectedThread;
+    }
+
+    public void setmAcceptConnectionThread(AcceptConnectionThread mAcceptConnectionThread) {
+        this.mAcceptConnectionThread = mAcceptConnectionThread;
+    }
+
+    public StartConnectionThread getmStartConnectionThread() {
+        return mStartConnectionThread;
+    }
+
+    public ConnectedThread getmConnectedThread() {
+        return mConnectedThread;
+    }
+
+    public AcceptConnectionThread getmAcceptConnectionThread() {
+        return mAcceptConnectionThread;
+    }
+
+    public String getmCurrentDeviceAddress() {
+        return mCurrentDeviceAddress;
+    }
+
+    public void setmCurrentDeviceAddress(String mCurrentDeviceAddress) {
+        this.mCurrentDeviceAddress = mCurrentDeviceAddress;
+    }
+
+    public BluetoothAdapter getmBluetoothAdapter() {
+        return mBluetoothAdapter;
+    }
+
+    public void setmBluetoothAdapter(BluetoothAdapter mBluetoothAdapter) {
+        this.mBluetoothAdapter = mBluetoothAdapter;
+    }
+
+    public class StartConnectionThread extends Thread {
 
         private final BluetoothSocket mSocket;
         private final BluetoothDevice mDevice;
@@ -283,7 +329,7 @@ public class BluetoothService extends Service {
         }
     }
 
-    private class ConnectedThread extends Thread {
+    public class ConnectedThread extends Thread {
         private BluetoothSocket mSocket;
         private InputStream mInStream;
         private OutputStream mOutStream;
@@ -351,7 +397,7 @@ public class BluetoothService extends Service {
         }
     }
 
-    private class AcceptConnectionThread extends Thread {
+    public class AcceptConnectionThread extends Thread {
         private final BluetoothServerSocket mServerSocket;
 
         public AcceptConnectionThread() {

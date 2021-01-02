@@ -13,7 +13,7 @@ import com.example.blue2.database.ConversationResult;
 
 import java.util.List;
 
-public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
+public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> implements AdaptersInterface {
 
     private List<ConversationResult> mConversations;
 

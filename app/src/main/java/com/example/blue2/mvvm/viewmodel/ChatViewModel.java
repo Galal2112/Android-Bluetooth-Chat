@@ -12,6 +12,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.blue2.database.AppDatabase;
+import com.example.blue2.database.AppDatabase_Impl;
 import com.example.blue2.database.Conversation;
 import com.example.blue2.database.ConversationDao;
 import com.example.blue2.database.Message;
@@ -19,7 +20,7 @@ import com.example.blue2.network.BluetoothService;
 
 import java.util.List;
 
-public class ChatViewModel extends AndroidViewModel {
+public class ChatViewModel extends AndroidViewModel implements ChatViewModelInterface {
     private LiveData<List<Message>> mMessages;
     private BluetoothDevice mDevice;
     private Conversation mConversation;
@@ -27,7 +28,9 @@ public class ChatViewModel extends AndroidViewModel {
 
     public ChatViewModel(@NonNull Application application) {
         super(application);
+
     }
+
 
     public void start(BluetoothDevice bluetoothDevice) {
         this.mDevice = bluetoothDevice;
@@ -73,7 +76,7 @@ public class ChatViewModel extends AndroidViewModel {
         }
     };
 
-    private void createOrGetConversation() {
+    public void createOrGetConversation() {
         Conversation conversation = mDao.getConversation(mDevice.getAddress());
         if (conversation == null) {
             conversation = new Conversation();
@@ -82,13 +85,49 @@ public class ChatViewModel extends AndroidViewModel {
             conversation.conversationId = mDao.insert(conversation);
         }
         this.mConversation = conversation;
+
     }
 
-    private void insertMessage(String textBody, String sender) {
+    public void insertMessage(String textBody, String sender) {
         Message message = new Message();
         message.parentConversationId = mConversation.conversationId;
         message.textBody = textBody;
         message.senderAddress = sender;
         mDao.insert(message);
     }
+
+
+    public void setmMessages(LiveData<List<Message>> mMessages) {
+        this.mMessages = mMessages;
+    }
+
+    public BluetoothDevice getmDevice() {
+        return mDevice;
+    }
+
+    public void setmDevice(BluetoothDevice mDevice) {
+        this.mDevice = mDevice;
+    }
+
+    public Conversation getmConversation() {
+        return mConversation;
+    }
+
+    public void setmConversation(Conversation mConversation) {
+        this.mConversation = mConversation;
+    }
+
+    public ConversationDao getmDao() {
+        return mDao;
+    }
+
+    public void setmDao(ConversationDao mDao) {
+        this.mDao = mDao;
+    }
+
+    public BroadcastReceiver getmReceiver() {
+        return mReceiver;
+    }
+
+
 }
