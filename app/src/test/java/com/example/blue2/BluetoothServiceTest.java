@@ -39,7 +39,7 @@ public class BluetoothServiceTest {
     }
 
     @Test
-    public void startListenerThreadTest() { // setter ung getter und alle Threads sind public geworden !
+    public void startListenerThreadTest() {
         BluetoothService.AcceptConnectionThread thread = mock(BluetoothService.AcceptConnectionThread.class);
         blueToothService.setmAcceptConnectionThread(thread);
 
