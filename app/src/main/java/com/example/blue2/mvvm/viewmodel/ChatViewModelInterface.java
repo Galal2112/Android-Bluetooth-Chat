@@ -24,11 +24,6 @@ public interface ChatViewModelInterface {
 
     void sendMessage(String textBody);
 
-
-    void setmMessages(LiveData<List<Message>> mMessages);
-
-    BluetoothDevice getmDevice();
-
     void setmDevice(BluetoothDevice mDevice);
 
     Conversation getmConversation();
@@ -39,10 +34,5 @@ public interface ChatViewModelInterface {
 
     void setmDao(ConversationDao mDao);
 
-    BroadcastReceiver getmReceiver();
-/*
-    public AppDatabase getAppDatabase();
 
-    public void setAppDatabase();
-*/
 }

@@ -19,11 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.junit.Assert.*;
 
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
 public class BluetoothServiceTest {
 
 
@@ -183,7 +178,25 @@ public class BluetoothServiceTest {
 
     }
 
+    @Test
+    public void cancelTest() {
 
+        BluetoothService.AcceptConnectionThread thread = mock(BluetoothService.AcceptConnectionThread.class);
+        blueToothService.setmAcceptConnectionThread(thread);
+
+        BluetoothService.ConnectedThread thread1 = mock(BluetoothService.ConnectedThread.class);
+        blueToothService.setmConnectedThread(thread1);
+
+        BluetoothService.StartConnectionThread thread2 = mock(BluetoothService.StartConnectionThread.class);
+        blueToothService.setmStartConnectionThread(thread2);
+
+        blueToothService.cancel();
+        assertTrue(blueToothService.getmStartConnectionThread() == null);
+        assertTrue(blueToothService.getmConnectedThread() == null);
+        assertTrue(blueToothService.getmAcceptConnectionThread() == null);
+
+
+    }
 
 
 }

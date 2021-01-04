@@ -41,12 +41,9 @@ public interface NetworkInterface {
 
     void setmCurrentDeviceAddress(String mCurrentDeviceAddress);
 
-    BluetoothAdapter getmBluetoothAdapter();
-
     void setmBluetoothAdapter(BluetoothAdapter mBluetoothAdapter);
 
     boolean isBrodcast();
 
-    void setBrodcast(boolean brodcast);
 
 }
