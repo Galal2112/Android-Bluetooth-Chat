@@ -19,7 +19,7 @@ import com.example.blue2.network.BluetoothService;
 
 import java.util.List;
 
-public class ChatViewModel extends AndroidViewModel {
+public class ChatViewModel extends AndroidViewModel implements ChatViewModelInterface {
     private LiveData<List<Message>> mMessages;
     private BluetoothDevice mDevice;
     private Conversation mConversation;
@@ -73,7 +73,7 @@ public class ChatViewModel extends AndroidViewModel {
         }
     };
 
-    private void createOrGetConversation() {
+    public void createOrGetConversation() {
         Conversation conversation = mDao.getConversation(mDevice.getAddress());
         if (conversation == null) {
             conversation = new Conversation();
@@ -84,11 +84,36 @@ public class ChatViewModel extends AndroidViewModel {
         this.mConversation = conversation;
     }
 
-    private void insertMessage(String textBody, String sender) {
+    public void insertMessage(String textBody, String sender) {
         Message message = new Message();
         message.parentConversationId = mConversation.conversationId;
         message.textBody = textBody;
         message.senderAddress = sender;
         mDao.insert(message);
+    }
+
+    @Override
+    public void setmDevice(BluetoothDevice mDevice) {
+        this.mDevice = mDevice;
+    }
+
+    @Override
+    public Conversation getmConversation() {
+        return mConversation;
+    }
+
+    @Override
+    public void setmConversation(Conversation mConversation) {
+        this.mConversation = mConversation;
+    }
+
+    @Override
+    public ConversationDao getmDao() {
+        return mDao;
+    }
+
+    @Override
+    public void setmDao(ConversationDao mDao) {
+        this.mDao = mDao;
     }
 }
