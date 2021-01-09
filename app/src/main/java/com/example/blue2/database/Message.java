@@ -8,6 +8,12 @@ import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 
+/**
+ * Table Message, it has @ManyToOne relation with conversation
+ * @ForeignKey "conversation_id".
+ * onDelete CASCADE, if a row of the referenced table is deleted, then all matching rows in the referencing table are deleted.
+ */
+
 @Entity(foreignKeys = @ForeignKey(entity = Conversation.class,
         parentColumns = "conversation_id",
         childColumns = "parent_conversation_id",

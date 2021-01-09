@@ -3,15 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mvvm.view.ChatListActivity">
+    tools:context=".mvvm.view.activity.ChatListActivity">
+    <RelativeLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include layout="@layout/layout_enable_bluetooth"/>
+
+        <include layout="@layout/layout_empty_chat_list" />
+    </RelativeLayout>
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_below="@+id/header_layout"
         android:id="@+id/rv_conversations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <include layout="@layout/layout_enable_bluetooth"/>
-        <include layout="@layout/layout_empty_chat_list"/>
-    </RelativeLayout>
 </RelativeLayout>
