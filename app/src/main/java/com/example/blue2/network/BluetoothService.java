@@ -21,10 +21,12 @@ import java.util.UUID;
 
 public class BluetoothService extends Service {
 
+    // Available actions that the service handle
     public static final String ACTION_SEND_MESSAGE = "com.example.blue2.action.SEND_MESSAGE";
     public static final String ACTION_START = "com.example.blue2.action.START";
     public static final String ACTION_CANCEL = "com.example.blue2.action.CANCEL";
 
+    // Actions that the service send as broadcast
     public static final String ACTION_MESSAGE_SENT = "com.example.blue2.action.MESSAGE_SENT";
     public static final String ACTION_MESSAGE_RECEIVED = "com.example.blue2.action.MESSAGE_RECEIVED";
     public static final String ACTION_MESSAGE_SEND_FAILED = "com.example.blue2.action.MESSAGE_SEND_FAILED";
@@ -33,28 +35,44 @@ public class BluetoothService extends Service {
     public static final String ACTION_CONNECTION_LOST = "com.example.blue2.action.CONNECTION_LOST";
     public static final String ACTION_DEVICE_NAME = "com.example.blue2.action.DEVICE_NAME";
 
+    // Constants used for sending/receiving data in/from intents
     public static final String EXTRA_BLUETOOTH_DEVICE = "com.example.blue2.extra.BLUETOOTH_DEVICE";
     public static final String EXTRA_MESSAGE = "com.example.blue2.extra.EXTRA_MESSAGE";
     public static final String EXTRA_DEVICE_NAME = "com.example.blue2.extra.DEVICE_NAME";
     public static final String EXTRA_DEVICE_ADDRESS = "com.example.blue2.extra.DEVICE_ADDRESS";
 
-
+    // connection port one to one.
     private static final UUID MY_UUID_SECURE = UUID.fromString("b9d04dfb-3da4-4622-b253-63f8ace49d9a");
+
+    // states of connection
     public static final int STATE_NONE = 0;
     public static final int STATE_LISTEN = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
+
     private static final String BLUE_CHAT_APP = "BluetoothService";
 
+    /**
+     * the main 3 Threads in the App
+     * StartConnectionThread: start thread to pair device
+     * ConnectedThread: connected thread to write and read from socket
+     * AcceptConnectionThread: Accept thread waiting for connection
+     */
     private StartConnectionThread mStartConnectionThread;
     private ConnectedThread mConnectedThread;
     private AcceptConnectionThread mAcceptConnectionThread;
 
+    // Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter;
+    // Current device the user chats with
     private String mCurrentDeviceAddress = "";
 
+    // Current state of connection
     private static int mState = STATE_NONE;
 
+    /**
+     * To run actions on main thread from background thread, in this case the only action is showing a toast
+     */
     private final Handler mUIHanlder = new Handler(Looper.getMainLooper());
 
     @Override
@@ -65,8 +83,9 @@ public class BluetoothService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(ACTION_START)) {
-            Log.d("Galal Ahmed", "Start service: " + this);
+            // on start action, get the device from intent
             BluetoothDevice bluetoothDevice = intent.getParcelableExtra(EXTRA_BLUETOOTH_DEVICE);
+            // if there is no device or the device is not the current device in the service then start connection from beginning
             if (bluetoothDevice == null || mState != STATE_CONNECTED || !bluetoothDevice.getAddress().equals(mCurrentDeviceAddress)) {
                 mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 mState = STATE_NONE;
@@ -82,10 +101,11 @@ public class BluetoothService extends Service {
                 }
             }
         } else if (intent.getAction().equals(ACTION_SEND_MESSAGE)) {
-            Log.d("Galal Ahmed", "Send message from service: " + this);
+            // On send message action, write the message to the socket
             String message = intent.getStringExtra(EXTRA_MESSAGE);
             sendData(message.getBytes());
         } else if (intent.getAction().equals(ACTION_CANCEL)) {
+            // Close connection when user closes chat screen
            cancel();
         }
         return START_STICKY;
@@ -105,6 +125,7 @@ public class BluetoothService extends Service {
         super.onDestroy();
     }
 
+    // cancel connection if any and start the thread that accepts connections
     private synchronized void startListenerThread() {
 
         if (mStartConnectionThread != null) {
@@ -123,6 +144,7 @@ public class BluetoothService extends Service {
         }
     }
 
+    // cancel current connection if any and try connecting to the provided device
     private synchronized void connectToDevice(BluetoothDevice bluetoothDevice) {
 
         if (mState == STATE_CONNECTING) {
@@ -141,6 +163,7 @@ public class BluetoothService extends Service {
         mStartConnectionThread.start();
     }
 
+    // When receiving a connection from a device, open a socket with this device to start sending and receiving data
     private synchronized void onDeviceConnected(BluetoothSocket socket, BluetoothDevice device) {
 
         if (mStartConnectionThread != null) {
@@ -168,6 +191,7 @@ public class BluetoothService extends Service {
         mCurrentDeviceAddress = device.getAddress();
     }
 
+    // Cancel all threads
     private synchronized void cancel() {
         mState = STATE_NONE;
 
@@ -188,6 +212,7 @@ public class BluetoothService extends Service {
         stopSelf();
     }
 
+    // Send data in the current socket connected
     private void sendData(byte[] data) {
         if (mConnectedThread != null) {
             ConnectedThread r;
@@ -209,18 +234,21 @@ public class BluetoothService extends Service {
 
     }
 
+    // When connection fails, try to open the connection again
     private void onConnectionFailed() {
         sendBroadcast(ACTION_CONNECTION_FAILURE, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
+    // When connection is lost, try to open the connection again
     private void onConnectionLost() {
         sendBroadcast(ACTION_CONNECTION_LOST, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
+    // utility method to send broadcast with action and data
     private void sendBroadcast(String action, Map<String, String> extras) {
         Intent intent = new Intent(action);
         if (extras != null && !extras.isEmpty()) {
@@ -231,6 +259,7 @@ public class BluetoothService extends Service {
         sendBroadcast(intent);
     }
 
+     // Thread to pair device
     private class StartConnectionThread extends Thread {
 
         private final BluetoothSocket mSocket;
@@ -240,6 +269,7 @@ public class BluetoothService extends Service {
             mDevice = device;
             BluetoothSocket tmp = null;
 
+            // get socket with the device
             try {
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
             } catch (IOException e) {
@@ -251,12 +281,15 @@ public class BluetoothService extends Service {
 
         public void run() {
             try {
+                // try connecting with the device
                 mSocket.connect();
+                // notify of connection success
                 sendBroadcast(ACTION_CONNECTION_SUCCESS, null);
                 Log.d("Galal Ahmed", "Connected");
             } catch (IOException e) {
                 mUIHanlder.post(() -> Toast.makeText(getApplicationContext(), "Connecting error " + e.getMessage(), Toast.LENGTH_LONG).show());
                 try {
+                    // in case of error close the socket
                     mSocket.close();
                 } catch (IOException e2) {
                     Log.e("Galal Ahmed", "unable to close() socket during connection failure", e2);
@@ -271,9 +304,11 @@ public class BluetoothService extends Service {
 
             mUIHanlder.post(() -> Toast.makeText(getApplicationContext(), "Connecting...", Toast.LENGTH_LONG).show());
 
+            // do the next step by starting the read and write thread
             onDeviceConnected(mSocket, mDevice);
         }
 
+        // close the socket on cancel
         public void cancel() {
             try {
                 mSocket.close();
@@ -283,6 +318,7 @@ public class BluetoothService extends Service {
         }
     }
 
+     // connected thread to write and read from socket
     private class ConnectedThread extends Thread {
         private BluetoothSocket mSocket;
         private InputStream mInStream;
@@ -294,6 +330,7 @@ public class BluetoothService extends Service {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
+            // get input and output streams from the socket
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
@@ -316,6 +353,7 @@ public class BluetoothService extends Service {
 
             while (mState == STATE_CONNECTED) {
                 try {
+                    // read received messages from the socket
                     bytes = mInStream.read(buffer);
                     String str = new String(buffer, 0, bytes);
                     mUIHanlder.post(() -> Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show());
@@ -333,6 +371,7 @@ public class BluetoothService extends Service {
 
         public void write(byte[] buffer) {
             try {
+                // write sent message in the socket
                 mOutStream.write(buffer);
                 mUIHanlder.post(() -> Toast.makeText(getApplicationContext(), "Sent", Toast.LENGTH_LONG).show());
                 sendBroadcast(ACTION_MESSAGE_SENT, null);
@@ -342,6 +381,7 @@ public class BluetoothService extends Service {
             }
         }
 
+        // on cancel, close the socket
         public void cancel() {
             try {
                 mSocket.close();
@@ -351,6 +391,7 @@ public class BluetoothService extends Service {
         }
     }
 
+    // Accept thread waiting for connection
     private class AcceptConnectionThread extends Thread {
         private final BluetoothServerSocket mServerSocket;
 
@@ -400,6 +441,7 @@ public class BluetoothService extends Service {
             Log.d("Galal Ahmed", "END mAcceptThread");
         }
 
+        // on cancel, close the socket
         public void cancel() {
             try {
                 mServerSocket.close();

@@ -1,20 +1,24 @@
-package com.example.blue2.mvvm.view;
+package com.example.blue2.mvvm.view.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.blue2.R;
 import com.example.blue2.database.ConversationResult;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+/**
+ * the data source for the conversations recycler View
+ */
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
 
+    // conversations list
     private List<ConversationResult> mConversations;
 
     public ConversationAdapter(List<ConversationResult> conversations) {
@@ -29,6 +33,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         return mConversations;
     }
 
+    // create cell view holder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,6 +41,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         return new ViewHolder(view);
     }
 
+    // bind data for the conversations appearing on the screen
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bindItem(mConversations.get(position));
@@ -46,6 +52,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         return mConversations.size();
     }
 
+    /**
+     * Conversation ViewHolder.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView shortcutTextView;
         private final TextView nameTextView;
@@ -59,12 +68,15 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         }
 
         void bindItem(ConversationResult conversation) {
+            // display device name
             nameTextView.setText(conversation.opponentName);
+            // display first character of device name as image
             if (conversation.opponentName != null) {
                 shortcutTextView.setText(String.valueOf(conversation.opponentName.charAt(0)));
             } else {
                 shortcutTextView.setText(" ");
             }
+            // display last message in the conversation
             messageTextView.setText(conversation.textBody);
         }
     }

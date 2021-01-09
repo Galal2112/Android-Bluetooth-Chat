@@ -9,22 +9,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Blue2">
-        <activity android:name=".mvvm.view.ChatActivity" />
+        <activity android:name=".mvvm.view.activity.ChatActivity" />
 
         <activity
-            android:name=".mvvm.view.ChatListActivity"
+            android:name=".mvvm.view.activity.ChatListActivity"
             android:label="@string/title_chat_list" />
 
-        <activity android:name=".OnBoardingActivity">
+        <activity android:name=".mvvm.view.activity.OnBoardingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
         <activity
-            android:name=".DeviceListActivity"
+            android:name=".mvvm.view.activity.DeviceListActivity"
             android:label="@string/select_Devices" />
         <service
             android:name=".network.BluetoothService"

@@ -1,4 +1,4 @@
-package com.example.blue2.mvvm.view;
+package com.example.blue2.mvvm.view.listener;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -7,6 +7,9 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * Listener for getting selected item position for recycler view
+ */
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener  {
 
     private OnItemClickListener mListener;
