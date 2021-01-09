@@ -4,8 +4,15 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * Conversation Table
+ */
 @Entity
 public class Conversation {
+    /**
+     * conversationId has auto generate, "a number that increases every time"
+     * and has name conversation_id in DataBase
+     */
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "conversation_id")
     public long conversationId;

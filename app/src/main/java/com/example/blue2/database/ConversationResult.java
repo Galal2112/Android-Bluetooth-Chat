@@ -2,6 +2,9 @@ package com.example.blue2.database;
 
 import androidx.room.ColumnInfo;
 
+/**
+ * projection result for conversation list query.
+ */
 public class ConversationResult {
     @ColumnInfo(name = "conversation_id")
     public int conversationId;
