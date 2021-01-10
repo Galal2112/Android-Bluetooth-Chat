@@ -11,6 +11,11 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.blue2.database.AppDatabase;
+import com.example.blue2.database.Conversation;
+import com.example.blue2.database.ConversationDao;
+import com.example.blue2.database.Message;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,6 +83,7 @@ public class BluetoothService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+    private final ConversationDao mDao = AppDatabase.getDatabase(getApplication()).conversationDao();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -102,6 +108,7 @@ public class BluetoothService extends Service {
         } else if (intent.getAction().equals(ACTION_SEND_MESSAGE)) {
             // On send message action, write the message to the socket
             String message = intent.getStringExtra(EXTRA_MESSAGE);
+            insertMessage(message, null);
             sendData(message.getBytes());
         } else if (intent.getAction().equals(ACTION_CANCEL)) {
             // Close connection when user closes chat screen
@@ -258,6 +265,33 @@ public class BluetoothService extends Service {
         sendBroadcast(intent);
     }
 
+    /**
+     * insert the message in the database, live data of the messages list will update automatically
+     */
+    private void insertMessage(String textBody, String sender) {
+        if (mCurrentDeviceAddress == null || mCurrentDeviceAddress.isEmpty()) {
+           return;
+        }
+        Conversation conversation = createOrGetConversation();
+        Message message = new Message();
+        message.parentConversationId = conversation.conversationId;
+        message.textBody = textBody;
+        message.senderAddress = sender;
+        mDao.insert(message);
+    }
+
+    private Conversation createOrGetConversation() {
+        Conversation conversation = mDao.getConversation(mCurrentDeviceAddress);
+        BluetoothDevice device = mBluetoothAdmin.getRemoteDevice(mCurrentDeviceAddress);
+        if (conversation == null) {
+            conversation = new Conversation();
+            conversation.opponentName = device.getName();
+            conversation.opponentAddress = device.getAddress();
+            conversation.conversationId = mDao.insert(conversation);
+        }
+        return conversation;
+    }
+
      // Thread to pair device
     private class StartConnectionThread extends Thread {
 
@@ -360,6 +394,7 @@ public class BluetoothService extends Service {
                     Map<String, String> extras = new HashMap<>();
                     extras.put(EXTRA_MESSAGE, str);
                     sendBroadcast(ACTION_MESSAGE_RECEIVED, extras);
+                    insertMessage(str, mCurrentDeviceAddress);
                 } catch (IOException e) {
                     Log.e("Galal Ahmed", "disconnected", e);
                     onConnectionLost();
