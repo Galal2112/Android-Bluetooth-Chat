@@ -16,6 +16,7 @@ public interface IBluetoothAdmin {
     boolean isEnabled();
     void enableBluetooth(Activity activity, int requestCode);
     ArrayList<BluetoothDevice> getPairedDevices();
+    void makeMyDeviceDiscoverable(Activity activity, int requestCode);
     <T extends Activity & DiscoveryObserver> void startDiscovery(T observer);
     <T extends Activity & DiscoveryObserver> void cancelDiscovery(T observer);
     <T extends Fragment & DiscoveryObserver> void startDiscovery(T observer);

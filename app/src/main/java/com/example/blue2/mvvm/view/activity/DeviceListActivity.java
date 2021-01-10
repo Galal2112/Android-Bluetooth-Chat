@@ -1,9 +1,12 @@
 package com.example.blue2.mvvm.view.activity;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.example.blue2.R;
 import com.example.blue2.mvvm.view.adapter.BluetoothDevicesAdapter;
@@ -16,6 +19,7 @@ import com.example.blue2.network.IBluetoothAdmin;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,6 +32,8 @@ public class DeviceListActivity extends AppCompatActivity implements ScanForDevi
     private BluetoothDevicesAdapter mAdapter;
     private final IBluetoothAdmin mBluetoothAdmin = BluetoothAdmin.sharedAdmin;
     private final List<BluetoothDevice> mPairedDevicesList = new ArrayList<>();
+
+    private static final int MAKE_DISCOVERABLE_RESULT_CODE = 2112;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,7 @@ public class DeviceListActivity extends AppCompatActivity implements ScanForDevi
 
         // scan button to show the user near by devices and the user can pair with this devices
         findViewById(R.id.btn_scan_bluetooth).setOnClickListener(this::onClick);
+        findViewById(R.id.btn_make_discoverable).setOnClickListener(this::onClick);
     }
 
     @Override
@@ -65,9 +72,14 @@ public class DeviceListActivity extends AppCompatActivity implements ScanForDevi
     // Click event for buttons
     private void onClick(View v) {
         switch (v.getId()) {
-            // when scan button clicked, start scan
+            //when Discoverable button clicked start discoverable.
+            case R.id.btn_make_discoverable:
+                BluetoothAdmin.sharedAdmin.makeMyDeviceDiscoverable(this, MAKE_DISCOVERABLE_RESULT_CODE);
+                break;
+            // when scan button clicked, start scan.
             case R.id.btn_scan_bluetooth:
                 startScan();
+                break;
             default:
                 break;
         }
@@ -97,5 +109,17 @@ public class DeviceListActivity extends AppCompatActivity implements ScanForDevi
     public void onDeviceSelected(BluetoothDevice bluetoothDevice) {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         ChatActivity.startActivity(this, bluetoothDevice);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == MAKE_DISCOVERABLE_RESULT_CODE){
+            if (resultCode != Activity.RESULT_CANCELED) {
+                Toast.makeText(this,"Make Discoverable is enabled for " + (resultCode / 60) +" minutes",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this,"Make Discoverable is disable",Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

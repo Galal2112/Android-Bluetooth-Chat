@@ -48,6 +48,12 @@ public class BluetoothAdmin implements IBluetoothAdmin {
     }
 
     @Override
+    public void makeMyDeviceDiscoverable(Activity activity, int requestCode) {
+        Intent dIntent =  new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        activity.startActivityForResult(dIntent, requestCode);
+    }
+
+    @Override
     public <T extends Activity & DiscoveryObserver> void startDiscovery(T observer) {
         startDiscovery(observer, observer);
     }
