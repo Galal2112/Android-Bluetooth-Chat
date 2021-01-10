@@ -1,12 +1,8 @@
 package com.example.blue2.mvvm.view.activity;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +16,9 @@ import com.example.blue2.database.ConversationResult;
 import com.example.blue2.mvvm.view.adapter.ConversationAdapter;
 import com.example.blue2.mvvm.view.listener.RecyclerItemClickListener;
 import com.example.blue2.mvvm.viewmodel.ChatListViewModel;
+import com.example.blue2.network.BluetoothAdmin;
 import com.example.blue2.network.BluetoothService;
+import com.example.blue2.network.IBluetoothAdmin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +43,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * if user clicked on a previous chat it will open and he can read the previous messages and
  * the device will try atomically to connect with the other device
  */
-public class ChatListActivity extends AppCompatActivity {
+public class ChatListActivity extends AppCompatActivity implements IBluetoothAdmin.BluetoothStateObserver {
 
     private static final int REQUEST_ENABLE_BLUETOOTH = 1001;
 
@@ -54,6 +52,7 @@ public class ChatListActivity extends AppCompatActivity {
     private Button mStartChatButton;
     private ChatListViewModel mViewModel;
     private ConversationAdapter mAdapter;
+    private final IBluetoothAdmin mBluetoothAdmin = BluetoothAdmin.sharedAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,7 @@ public class ChatListActivity extends AppCompatActivity {
 
         // set the views from XML
         mEnableBluetoothView = findViewById(R.id.ll_enable_bluetooth);
-        mEmptyView = findViewById(R.id.ll_empty_chat_list);
+        mEmptyView = findViewById(R.id.rl_empty_chat_list);
         mStartChatButton = findViewById(R.id.btn_start_new_chat);
         RecyclerView conversationsRecyclerView = findViewById(R.id.rv_conversations);
         conversationsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -74,16 +73,14 @@ public class ChatListActivity extends AppCompatActivity {
         conversationsRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, this::onItemClick));
 
         // Start bluetooth service if bluetooth is enabled.
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter.isEnabled()){
+        if(mBluetoothAdmin.isEnabled()){
             startBluetoothService();
         }
         // if bluetooth is enabled, show chat view
-        enableChat(bluetoothAdapter.isEnabled());
+        enableChat(mBluetoothAdmin.isEnabled());
 
-        // Intent filter, to check if the usr changed the state of bluetooth
-        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        registerReceiver(mReceiver, filter);
+        // observe Bluetooth state change, to check if the usr changed the state of bluetooth
+        mBluetoothAdmin.observeBluetoothState(this);
 
         bindActions();
         observeConversations();
@@ -92,7 +89,7 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
+        mBluetoothAdmin.unRegisterBluetoothStateObserver(this);
     }
 
     @Override
@@ -124,7 +121,7 @@ public class ChatListActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.menu_start_chat:
                 // when usr click to start chat from menu, check if bluetooth is enabled
-                if(BluetoothAdapter.getDefaultAdapter().isEnabled()){
+                if(mBluetoothAdmin.isEnabled()){
                     startNewChat();
                 } else {
                     // show toast when bluetooth is not enabled
@@ -140,12 +137,10 @@ public class ChatListActivity extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.btn_turnon_bluetooth:
                 // Start enable Bluetooth and receive the result in onActivityResult
-                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
-                break;
+                mBluetoothAdmin.enableBluetooth(this, REQUEST_ENABLE_BLUETOOTH);
             case R.id.btn_start_new_chat:
                 // In case user clicked start chat, he needs Bluetooth to be ON
-                if (BluetoothAdapter.getDefaultAdapter().isEnabled()){
+                if (mBluetoothAdmin.isEnabled()){
                     startNewChat();
                 } else {
                     Toast.makeText(this, R.string.enable_bluetooth_error,Toast.LENGTH_LONG).show();
@@ -208,7 +203,7 @@ public class ChatListActivity extends AppCompatActivity {
     // Handle clicking one of the history conversations
     private void onItemClick(View view, int position) {
         ConversationResult conversation = mAdapter.getConversations().get(position);
-        BluetoothDevice bluetoothDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(conversation.opponentAddress);
+        BluetoothDevice bluetoothDevice = mBluetoothAdmin.getRemoteDevice(conversation.opponentAddress);
         if (bluetoothDevice != null) {
             ChatActivity.startActivity(this, bluetoothDevice);
         }
@@ -223,32 +218,21 @@ public class ChatListActivity extends AppCompatActivity {
 
 
     /**
-     * Check the action of the received intent
-     * in case of state changed, get the state from extra
-     *
-     * and check the bluetooth adapter state if the bluetooth is turned off then enable chat will be false
-     *  if the bluetooth is turned on, then enable chat will be true.
+     * Check the state bluetooth.
+     * in case of state on, enable chat.
+     * in case of state off, disable chat.
      */
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
 
-            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
-                        BluetoothAdapter.ERROR);
-                switch (state) {
-                    case BluetoothAdapter.STATE_OFF:
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        enableChat(false);
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        enableChat(true);
-                        break;
-                }
-            }
+    @Override
+    public void onStateChanged(IBluetoothAdmin.BluetoothState state) {
+        switch (state){
+            case ON:
+                enableChat(true);
+                break;
+            case OFF:
+                enableChat(false);
+                break;
         }
-    };
 
+    }
 }

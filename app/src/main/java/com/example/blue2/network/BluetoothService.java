@@ -1,7 +1,6 @@
 package com.example.blue2.network;
 
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -63,7 +62,7 @@ public class BluetoothService extends Service {
     private AcceptConnectionThread mAcceptConnectionThread;
 
     // Bluetooth adapter
-    private BluetoothAdapter mBluetoothAdapter;
+    private IBluetoothAdmin mBluetoothAdmin;
     // Current device the user chats with
     private String mCurrentDeviceAddress = "";
 
@@ -87,7 +86,7 @@ public class BluetoothService extends Service {
             BluetoothDevice bluetoothDevice = intent.getParcelableExtra(EXTRA_BLUETOOTH_DEVICE);
             // if there is no device or the device is not the current device in the service then start connection from beginning
             if (bluetoothDevice == null || mState != STATE_CONNECTED || !bluetoothDevice.getAddress().equals(mCurrentDeviceAddress)) {
-                mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                mBluetoothAdmin = BluetoothAdmin.sharedAdmin;
                 mState = STATE_NONE;
                 if (bluetoothDevice == null) {
                     startListenerThread();
@@ -223,7 +222,7 @@ public class BluetoothService extends Service {
             r.write(data);
         } else {
             if (mCurrentDeviceAddress != null) {
-                BluetoothDevice bluetoothDevice = mBluetoothAdapter.getRemoteDevice(mCurrentDeviceAddress);
+                BluetoothDevice bluetoothDevice = mBluetoothAdmin.getRemoteDevice(mCurrentDeviceAddress);
                 if (bluetoothDevice != null) {
                     connectToDevice(bluetoothDevice);
                 }
@@ -398,7 +397,7 @@ public class BluetoothService extends Service {
         public AcceptConnectionThread() {
             BluetoothServerSocket tmp = null;
             try {
-                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(BLUE_CHAT_APP,
+                tmp = mBluetoothAdmin.listenUsingRfcommWithServiceRecord(BLUE_CHAT_APP,
                         MY_UUID_SECURE);
             } catch (IOException e) {
                 Log.e("Galal Ahmed", "Error listen() failed", e);

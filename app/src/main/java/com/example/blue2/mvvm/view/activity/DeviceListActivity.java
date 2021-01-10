@@ -1,20 +1,20 @@
 package com.example.blue2.mvvm.view.activity;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.example.blue2.R;
-import com.example.blue2.mvvm.view.fragment.ScanForDeviceFragment;
 import com.example.blue2.mvvm.view.adapter.BluetoothDevicesAdapter;
+import com.example.blue2.mvvm.view.fragment.ScanForDeviceFragment;
 import com.example.blue2.mvvm.view.listener.RecyclerItemClickListener;
 import com.example.blue2.mvvm.view.listener.ScanForDeviceCallback;
+import com.example.blue2.network.BluetoothAdmin;
+import com.example.blue2.network.IBluetoothAdmin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class DeviceListActivity extends AppCompatActivity implements ScanForDeviceCallback {
 
     private BluetoothDevicesAdapter mAdapter;
-    private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private final IBluetoothAdmin mBluetoothAdmin = BluetoothAdmin.sharedAdmin;
     private final List<BluetoothDevice> mPairedDevicesList = new ArrayList<>();
 
     @Override
@@ -34,8 +34,7 @@ public class DeviceListActivity extends AppCompatActivity implements ScanForDevi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
         // get the paired devices and add them in paired devices list
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        mPairedDevicesList.addAll(pairedDevices);
+        mPairedDevicesList.addAll(mBluetoothAdmin.getPairedDevices());
 
         // get the list from xml and show the devices in it
         RecyclerView devicesRecyclerView = findViewById(R.id.rv_paired_devices);
@@ -58,9 +57,8 @@ public class DeviceListActivity extends AppCompatActivity implements ScanForDevi
 
     // Get recent list of paired devices and refresh view to show it
     private void refreshList() {
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         mPairedDevicesList.clear();
-        mPairedDevicesList.addAll(pairedDevices);
+        mPairedDevicesList.addAll(mBluetoothAdmin.getPairedDevices());
         mAdapter.notifyDataSetChanged();
     }
 
