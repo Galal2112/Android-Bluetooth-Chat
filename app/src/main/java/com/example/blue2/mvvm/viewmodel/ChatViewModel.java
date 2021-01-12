@@ -2,10 +2,7 @@ package com.example.blue2.mvvm.viewmodel;
 
 import android.app.Application;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 
 import com.example.blue2.database.AppDatabase;
 import com.example.blue2.database.Conversation;
@@ -44,8 +41,6 @@ public class ChatViewModel extends AndroidViewModel implements ChatViewModelInte
         intent.setAction(BluetoothService.ACTION_START);
         intent.putExtra(BluetoothService.EXTRA_BLUETOOTH_DEVICE, bluetoothDevice);
         getApplication().startService(intent);
-        IntentFilter receivedMsgFilter = new IntentFilter(BluetoothService.ACTION_MESSAGE_RECEIVED);
-        getApplication().registerReceiver(mReceiver, receivedMsgFilter);
         createOrGetConversation();
     }
 
@@ -60,7 +55,6 @@ public class ChatViewModel extends AndroidViewModel implements ChatViewModelInte
 
     // when the screen us destroyed notify the bluetooth service
     public void onDestroy() {
-        getApplication().unregisterReceiver(mReceiver);
         Intent intent = new Intent(getApplication(), BluetoothService.class);
         intent.setAction(BluetoothService.ACTION_CANCEL);
         getApplication().startService(intent);
@@ -78,24 +72,7 @@ public class ChatViewModel extends AndroidViewModel implements ChatViewModelInte
         intent.setAction(BluetoothService.ACTION_SEND_MESSAGE);
         intent.putExtra(BluetoothService.EXTRA_MESSAGE, textBody);
         getApplication().startService(intent);
-        insertMessage(textBody, null);
     }
-
-    // Receiver to handle received messages from the other user
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        /**
-         * if the message action received, get the massage from extra and insert this message
-         * @param context
-         * @param intent
-         */
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BluetoothService.ACTION_MESSAGE_RECEIVED)) {
-                String text = intent.getStringExtra(BluetoothService.EXTRA_MESSAGE);
-                insertMessage(text, mDevice.getAddress());
-            }
-        }
-    };
 
     /**
      * to get the conversation from Database by the device address
@@ -111,17 +88,6 @@ public class ChatViewModel extends AndroidViewModel implements ChatViewModelInte
             conversation.conversationId = mDao.insert(conversation);
         }
         this.mConversation = conversation;
-    }
-
-    /**
-     * insert the message in the database, live data of the messages list will update automatically
-     */
-    public void insertMessage(String textBody, String sender) {
-        Message message = new Message();
-        message.parentConversationId = mConversation.conversationId;
-        message.textBody = textBody;
-        message.senderAddress = sender;
-        mDao.insert(message);
     }
 
     @Override

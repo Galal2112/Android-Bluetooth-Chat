@@ -64,5 +64,5 @@ public interface ChatViewModelInterface {
      */
 
     void setmDao(ConversationDao mDao);
-    
+
 }

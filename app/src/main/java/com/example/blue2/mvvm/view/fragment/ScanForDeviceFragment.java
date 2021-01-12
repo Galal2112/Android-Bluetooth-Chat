@@ -1,12 +1,8 @@
 package com.example.blue2.mvvm.view.fragment;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.os.Build;
@@ -23,6 +19,8 @@ import com.example.blue2.R;
 import com.example.blue2.mvvm.view.adapter.BluetoothDevicesAdapter;
 import com.example.blue2.mvvm.view.listener.RecyclerItemClickListener;
 import com.example.blue2.mvvm.view.listener.ScanForDeviceCallback;
+import com.example.blue2.network.BluetoothAdmin;
+import com.example.blue2.network.IBluetoothAdmin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +37,14 @@ import static android.widget.Toast.LENGTH_SHORT;
 /**
  * this fragment is for start bluetooth discovery.
  */
-public class ScanForDeviceFragment extends DialogFragment {
+public class ScanForDeviceFragment extends DialogFragment implements IBluetoothAdmin.DiscoveryObserver {
 
     // request code for access location permission required for bluetooth discovery
     private static final int REQUEST_ACCESS_FINE_LOCATION = 2001;
 
     private BluetoothDevicesAdapter mAdapter;
     // adapter for the discovered devices recycler view
-    private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private final IBluetoothAdmin mBluetoothAdmin = BluetoothAdmin.sharedAdmin;
     // List of discovered devices during the scan
     private final List<BluetoothDevice> mDiscoveredDevicesList = new ArrayList<>();
 
@@ -63,24 +61,6 @@ public class ScanForDeviceFragment extends DialogFragment {
         if (context instanceof ScanForDeviceCallback) {
             mCallback = (ScanForDeviceCallback) context;
         }
-    }
-
-    /**
-     * 3 Intent filters to get the results of the discovery in the BroadcastReceiver
-     * if a device was found or the discover was finished, or discovery was started
-     *
-     * @param savedInstanceState
-     */
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        IntentFilter foundFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        IntentFilter filterDicoveryFinished = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        IntentFilter filterDicoveryStarted = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-
-        requireActivity().registerReceiver(mReceiver, foundFilter);
-        requireActivity().registerReceiver(mReceiver, filterDicoveryFinished);
-        requireActivity().registerReceiver(mReceiver, filterDicoveryStarted);
     }
 
     /**
@@ -150,7 +130,7 @@ public class ScanForDeviceFragment extends DialogFragment {
     }
 
     /**
-     * @param requestCode check for request access location
+     * @param requestCode  check for request access location
      * @param permissions
      * @param grantResults check if the usr accept the location permission, if usr accepted, discovery will be started
      */
@@ -170,61 +150,58 @@ public class ScanForDeviceFragment extends DialogFragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    // if fragmed is removed from screen, cancel discovery and unregister the receiver
+    // if fragment is removed from screen, cancel discovery and unregister the receiver
     @Override
     public void onDetach() {
         super.onDetach();
-        requireActivity().unregisterReceiver(mReceiver);
-        mBluetoothAdapter.cancelDiscovery();
+        mBluetoothAdmin.cancelDiscovery(this);
+    }
+
+    /*************** Handle discovery actions ***************/
+    @Override
+    public void onDiscoveryStarted() {
+        // show progress bar on discovery started
+        mScanInprogressView.setVisibility(View.VISIBLE);
+        mNoDevicesFoundView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDiscoveryFinished() {
+        // if discovery finished, hide progress bar
+        mScanInprogressView.setVisibility(View.GONE);
+        // if no devices found, show try again button
+        if (mDiscoveredDevicesList.size() == 0) {
+            mNoDevicesFoundView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onDeviceFound(BluetoothDevice device) {
+        // in case of device found, add it to the list if not added before
+        if (device != null && device.getName() != null) {
+            boolean found = false;
+            for (BluetoothDevice d : mDiscoveredDevicesList) {
+                if (d.getAddress().equals(device.getAddress())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                mDiscoveredDevicesList.add(device);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     // start bluetooth discovery and if discovery is running cancel it
     private void startDiscovery() {
-        if (mBluetoothAdapter.isDiscovering()) {
-            mBluetoothAdapter.cancelDiscovery();
-        }
-        mBluetoothAdapter.startDiscovery();
+        mBluetoothAdmin.startDiscovery(this);
     }
 
     // Handel list item click by canceling discovery and notify observer
     private void onItemClick(View view, int position) {
         if (mCallback != null) mCallback.onDeviceSelected(mDiscoveredDevicesList.get(position));
-        mBluetoothAdapter.cancelDiscovery();
+        mBluetoothAdmin.cancelDiscovery(this);
         dismiss();
     }
-
-    // Reciever for discovery actions
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // in case of device found, add it to the list if not added before
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (device != null && device.getName() != null) {
-                    boolean found = false;
-                    for (BluetoothDevice d : mDiscoveredDevicesList) {
-                        if (d.getAddress().equals(device.getAddress())) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        mDiscoveredDevicesList.add(device);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                // if discovery finished, hide progress bar
-                mScanInprogressView.setVisibility(View.GONE);
-                // if no devices found, show try again button
-                if (mDiscoveredDevicesList.size() == 0) {
-                    mNoDevicesFoundView.setVisibility(View.VISIBLE);
-                }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                // show progress bar on discovery started
-                mScanInprogressView.setVisibility(View.VISIBLE);
-                mNoDevicesFoundView.setVisibility(View.GONE);
-            }
-        }
-    };
 }

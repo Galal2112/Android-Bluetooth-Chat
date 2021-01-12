@@ -1,6 +1,5 @@
 package com.example.blue2.network;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
@@ -98,10 +97,10 @@ public interface NetworkInterface {
     /**
      * Methode , um den BluetoothAdapter zu setzen .
      *
-     * @param mBluetoothAdapter :der BluetoothAdapter
+     * @param mBluetoothAdmin :der BluetoothAdapter
      */
 
-    void setmBluetoothAdapter(BluetoothAdapter mBluetoothAdapter);
+    void setmBluetoothAdmin(IBluetoothAdmin mBluetoothAdmin);
 
     /**
      * Methode , um den Zustand der gesendeten Brodcast abzuholen

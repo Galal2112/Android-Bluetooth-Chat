@@ -51,6 +51,8 @@ public class ChatActivity extends AppCompatActivity {
         // get the bluetooth device the user started with
         BluetoothDevice bluetoothDevice = getIntent().getParcelableExtra(EXTRA_BLUETOOTH_DEVICE);
 
+        setTitle(bluetoothDevice.getName());
+
         // create view model
         mViewModel = new ViewModelProvider(this).get(ChatViewModel.class);
         mViewModel.start(bluetoothDevice);

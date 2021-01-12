@@ -1,10 +1,10 @@
 package com.example.blue2;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 import com.example.blue2.network.BluetoothService;
+import com.example.blue2.network.IBluetoothAdmin;
 import com.example.blue2.network.NetworkInterface;
 
 import org.junit.Before;
@@ -15,8 +15,6 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-
-
 public class BluetoothServiceTest {
 
 
@@ -25,10 +23,7 @@ public class BluetoothServiceTest {
 
     @Before
     public void Erzeugung() {
-
-
         blueToothService = new BluetoothService();
-
     }
 
     @Test
@@ -100,12 +95,12 @@ public class BluetoothServiceTest {
         BluetoothService.StartConnectionThread thread2 = mock(BluetoothService.StartConnectionThread.class);
         blueToothService.setmStartConnectionThread(thread2);
 
-        BluetoothAdapter bluetoothAdapter = mock(BluetoothAdapter.class);
+        IBluetoothAdmin bluetoothAdmin = mock(IBluetoothAdmin.class);
 
 
         blueToothService.setmCurrentDeviceAddress("123456");
-        BluetoothDevice bluetoothDevice1 = bluetoothAdapter.getRemoteDevice(blueToothService.getmCurrentDeviceAddress());
-        blueToothService.setmBluetoothAdapter(bluetoothAdapter);
+        BluetoothDevice bluetoothDevice1 = bluetoothAdmin.getRemoteDevice(blueToothService.getmCurrentDeviceAddress());
+        blueToothService.setmBluetoothAdmin(bluetoothAdmin);
         byte[] bytes = {1, 2, 3};
 
         blueToothService.sendData(bytes);
