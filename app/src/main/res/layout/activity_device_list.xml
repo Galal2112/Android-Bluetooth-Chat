@@ -6,6 +6,7 @@
     android:orientation="vertical"
     tools:context=".mvvm.view.activity.DeviceListActivity">
 
+    <include layout="@layout/layout_make_discoverable_for_device" />
     <include layout="@layout/layout_scan_for_device" />
 
    <androidx.recyclerview.widget.RecyclerView

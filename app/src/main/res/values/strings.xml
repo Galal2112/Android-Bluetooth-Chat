@@ -16,4 +16,8 @@
     <string name="no_devices_found">No devices found</string>
     <string name="try_again">Try again</string>
     <string name="enable_location_permt_warning">to be able to use Bluetooth chatting, you need first to accept the location permission</string>
+    <string name="msg_make_discoverable">Other devices can\'t find you?</string>
+    <string name="make_discoverable">Discoverable</string>
+
+
 </resources>

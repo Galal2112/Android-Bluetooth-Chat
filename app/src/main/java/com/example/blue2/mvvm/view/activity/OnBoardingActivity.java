@@ -1,11 +1,12 @@
 package com.example.blue2.mvvm.view.activity;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import com.example.blue2.R;
+import com.example.blue2.network.BluetoothAdmin;
+import com.example.blue2.network.IBluetoothAdmin;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,8 +25,8 @@ public class OnBoardingActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_on_boarding);
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
+        IBluetoothAdmin manager = BluetoothAdmin.sharedAdmin;
+        if (!manager.isBluetoothAvailable()) {
             // no bluetooth, then show error view
             findViewById(R.id.ll_start_chat_view).setVisibility(View.GONE);
             findViewById(R.id.ll_error_view).setVisibility(View.VISIBLE);

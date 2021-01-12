@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_scan_bluetooth"
+    android:id="@+id/ll_make_discoverable"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
-    android:paddingBottom="20dp"
-    android:paddingTop="10dp">
+    android:padding="20dp">
 
     <ImageView
         android:layout_width="30dp"
@@ -20,13 +17,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_weight="1"
-        android:text="@string/msg_scan_for_device"
+        android:text="@string/msg_make_discoverable"
         android:layout_marginEnd="10dp" />
 
     <Button
-        android:id="@+id/btn_scan_bluetooth"
+        android:id="@+id/btn_make_discoverable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAllCaps="false"
-        android:text="@string/scan" />
+        android:text="@string/make_discoverable" />
 </LinearLayout>
