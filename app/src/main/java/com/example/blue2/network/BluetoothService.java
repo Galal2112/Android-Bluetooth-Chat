@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class BluetoothService extends Service {
+public class BluetoothService extends Service implements NetworkInterface {
 
     // Available actions that the service handle
     public static final String ACTION_SEND_MESSAGE = "com.example.blue2.action.SEND_MESSAGE";
@@ -44,6 +44,8 @@ public class BluetoothService extends Service {
     public static final String EXTRA_MESSAGE = "com.example.blue2.extra.EXTRA_MESSAGE";
     public static final String EXTRA_DEVICE_NAME = "com.example.blue2.extra.DEVICE_NAME";
     public static final String EXTRA_DEVICE_ADDRESS = "com.example.blue2.extra.DEVICE_ADDRESS";
+
+    private boolean brodcast = false;
 
     // connection port one to one.
     private static final UUID MY_UUID_SECURE = UUID.fromString("b9d04dfb-3da4-4622-b253-63f8ace49d9a");
@@ -83,11 +85,12 @@ public class BluetoothService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-    private final ConversationDao mDao = AppDatabase.getDatabase(getApplication()).conversationDao();
+    private ConversationDao mDao;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(ACTION_START)) {
+            mDao = AppDatabase.getDatabase(getApplication()).conversationDao();
             // on start action, get the device from intent
             BluetoothDevice bluetoothDevice = intent.getParcelableExtra(EXTRA_BLUETOOTH_DEVICE);
             // if there is no device or the device is not the current device in the service then start connection from beginning
@@ -132,7 +135,7 @@ public class BluetoothService extends Service {
     }
 
     // cancel connection if any and start the thread that accepts connections
-    private synchronized void startListenerThread() {
+    public synchronized void startListenerThread() {
 
         if (mStartConnectionThread != null) {
             mStartConnectionThread.cancel();
@@ -151,7 +154,7 @@ public class BluetoothService extends Service {
     }
 
     // cancel current connection if any and try connecting to the provided device
-    private synchronized void connectToDevice(BluetoothDevice bluetoothDevice) {
+    public synchronized void connectToDevice(BluetoothDevice bluetoothDevice) {
 
         if (mState == STATE_CONNECTING) {
             if (mStartConnectionThread != null) {
@@ -170,7 +173,7 @@ public class BluetoothService extends Service {
     }
 
     // When receiving a connection from a device, open a socket with this device to start sending and receiving data
-    private synchronized void onDeviceConnected(BluetoothSocket socket, BluetoothDevice device) {
+    public synchronized void onDeviceConnected(BluetoothSocket socket, BluetoothDevice device) {
 
         if (mStartConnectionThread != null) {
             mStartConnectionThread.cancel();
@@ -198,7 +201,7 @@ public class BluetoothService extends Service {
     }
 
     // Cancel all threads
-    private synchronized void cancel() {
+    public synchronized void cancel() {
         mState = STATE_NONE;
 
         if (mStartConnectionThread != null) {
@@ -219,7 +222,7 @@ public class BluetoothService extends Service {
     }
 
     // Send data in the current socket connected
-    private void sendData(byte[] data) {
+    public void sendData(byte[] data) {
         if (mConnectedThread != null) {
             ConnectedThread r;
             synchronized (this) {
@@ -241,21 +244,21 @@ public class BluetoothService extends Service {
     }
 
     // When connection fails, try to open the connection again
-    private void onConnectionFailed() {
+    public void onConnectionFailed() {
         sendBroadcast(ACTION_CONNECTION_FAILURE, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
     // When connection is lost, try to open the connection again
-    private void onConnectionLost() {
+    public void onConnectionLost() {
         sendBroadcast(ACTION_CONNECTION_LOST, null);
         mState = STATE_NONE;
         startListenerThread();
     }
 
     // utility method to send broadcast with action and data
-    private void sendBroadcast(String action, Map<String, String> extras) {
+    public void sendBroadcast(String action, Map<String, String> extras) {
         Intent intent = new Intent(action);
         if (extras != null && !extras.isEmpty()) {
             for (String key : extras.keySet()) {
@@ -263,6 +266,57 @@ public class BluetoothService extends Service {
             }
         }
         sendBroadcast(intent);
+        brodcast = true;
+    }
+
+    @Override
+    public void setmBluetoothAdmin(IBluetoothAdmin mBluetoothAdapter) {
+        this.mBluetoothAdmin = mBluetoothAdapter;
+    }
+
+    @Override
+    public boolean isBrodcast() {
+        return brodcast;
+    }
+
+    @Override
+    public StartConnectionThread getmStartConnectionThread() {
+        return mStartConnectionThread;
+    }
+
+    @Override
+    public void setmStartConnectionThread(StartConnectionThread mStartConnectionThread) {
+        this.mStartConnectionThread = mStartConnectionThread;
+    }
+
+    @Override
+    public ConnectedThread getmConnectedThread() {
+        return mConnectedThread;
+    }
+
+    @Override
+    public void setmConnectedThread(ConnectedThread mConnectedThread) {
+        this.mConnectedThread = mConnectedThread;
+    }
+
+    @Override
+    public AcceptConnectionThread getmAcceptConnectionThread() {
+        return mAcceptConnectionThread;
+    }
+
+    @Override
+    public void setmAcceptConnectionThread(AcceptConnectionThread mAcceptConnectionThread) {
+        this.mAcceptConnectionThread = mAcceptConnectionThread;
+    }
+
+    @Override
+    public String getmCurrentDeviceAddress() {
+        return mCurrentDeviceAddress;
+    }
+
+    @Override
+    public void setmCurrentDeviceAddress(String mCurrentDeviceAddress) {
+        this.mCurrentDeviceAddress = mCurrentDeviceAddress;
     }
 
     /**
@@ -293,7 +347,7 @@ public class BluetoothService extends Service {
     }
 
      // Thread to pair device
-    private class StartConnectionThread extends Thread {
+    public class StartConnectionThread extends Thread {
 
         private final BluetoothSocket mSocket;
         private final BluetoothDevice mDevice;
@@ -352,7 +406,7 @@ public class BluetoothService extends Service {
     }
 
      // connected thread to write and read from socket
-    private class ConnectedThread extends Thread {
+    public class ConnectedThread extends Thread {
         private BluetoothSocket mSocket;
         private InputStream mInStream;
         private OutputStream mOutStream;
@@ -426,7 +480,7 @@ public class BluetoothService extends Service {
     }
 
     // Accept thread waiting for connection
-    private class AcceptConnectionThread extends Thread {
+    public class AcceptConnectionThread extends Thread {
         private final BluetoothServerSocket mServerSocket;
 
         public AcceptConnectionThread() {

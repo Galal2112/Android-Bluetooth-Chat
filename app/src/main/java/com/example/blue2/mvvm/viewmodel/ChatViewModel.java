@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-public class ChatViewModel extends AndroidViewModel {
+public class ChatViewModel extends AndroidViewModel implements ChatViewModelInterface  {
     // Live data for current conversation messages
     private LiveData<List<Message>> mMessages;
     // Bluetooth device that the user opened chat with
@@ -79,7 +79,7 @@ public class ChatViewModel extends AndroidViewModel {
      * if the conversation doesn't exist, then create a new conversation
      * and insert it in the database
      */
-    private void createOrGetConversation() {
+    public void createOrGetConversation() {
         Conversation conversation = mDao.getConversation(mDevice.getAddress());
         if (conversation == null) {
             conversation = new Conversation();
@@ -89,4 +89,30 @@ public class ChatViewModel extends AndroidViewModel {
         }
         this.mConversation = conversation;
     }
+
+    @Override
+    public void setmDevice(BluetoothDevice mDevice) {
+        this.mDevice = mDevice;
+    }
+
+    @Override
+    public Conversation getmConversation() {
+        return mConversation;
+    }
+
+    @Override
+    public void setmConversation(Conversation mConversation) {
+        this.mConversation = mConversation;
+    }
+
+    @Override
+    public ConversationDao getmDao() {
+        return mDao;
+    }
+
+    @Override
+    public void setmDao(ConversationDao mDao) {
+        this.mDao = mDao;
+    }
+
 }
